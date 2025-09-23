@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+coverage = "*"
+pytest = "*"
+
+[packages]
+boto3 = "*"
+cryptography = "*"
+sqlalchemy = "*"
+psycopg = {version = ">=3.1,<4", extras = ["binary"]}
+
+[requires]
+python_version = "3.12"

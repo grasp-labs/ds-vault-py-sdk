@@ -1,0 +1,59 @@
+name: Push Release to DynamoDB
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  push-release:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: eu-north-1
+      DOMAIN: ds
+      SERVICE_GROUP: packages
+      SERVICE_NAME: vault-sdk
+      ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Extract release info
+        id: meta
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "COMMIT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Push to DynamoDB
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws dynamodb put-item \
+            --table-name ds-coordination-release-fragments-prod \
+            --item '{
+              "PK": {"S": "${{ steps.meta.outputs.VERSION }}"},
+              "SK": {"S": "${{ env.DOMAIN }}#${{ env.SERVICE_GROUP }}#${{ env.SERVICE_NAME }}"},
+              "GSI1PK": {"S": "service#${{ env.SERVICE_NAME }}"},
+              "GSI1SK": {"S": "${{ steps.meta.outputs.VERSION }}"},
+              "GSI2PK": {"S": "latest#${{ env.DOMAIN }}#${{ env.SERVICE_GROUP }}"},
+              "GSI2SK": {"S": "${{ env.SERVICE_NAME }}"},
+              "domain": {"S": "${{ env.DOMAIN }}"},
+              "serviceGroup": {"S": "${{ env.SERVICE_GROUP }}"},
+              "serviceName": {"S": "${{ env.SERVICE_NAME }}"},
+              "version": {"S": "${{ steps.meta.outputs.VERSION }}"},
+              "commit": {"S": "${{ steps.meta.outputs.COMMIT_SHA }}"},
+              "artifact": {"S": "${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.DOMAIN }}/${{ env.SERVICE_NAME }}:${{ steps.meta.outputs.VERSION }}"},
+              "timestamp": {"S": "${{ steps.meta.outputs.TIMESTAMP }}"}
+            }' \
+            --region $AWS_REGION

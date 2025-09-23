@@ -1,0 +1,101 @@
+# --- Python bytecode / caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- C extensions / compiled artifacts ---
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# --- Distribution / packaging ---
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+sdist/
+var/
+
+# --- Virtual envs ---
+.venv/
+venv/
+ENV/
+env/
+.conda/
+.conda_env/
+
+# --- Test / coverage ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+*.py,cover
+coverage.xml
+.hypothesis/
+.benchmarks/
+
+# --- Type checkers / linters ---
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+.ruff_cache/
+
+# --- Notebooks ---
+.ipynb_checkpoints/
+
+# --- Logs / temp ---
+*.log
+logs/
+debug.log
+*.tmp
+*.temp
+
+# --- SQLite / local DBs (used by test shim) ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Docs (Sphinx, etc.) ---
+docs/_build/
+
+# --- Editors / IDE ---
+.vscode/
+.idea/
+*.iml
+*.sublime-*
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- AWS / sensitive files (never commit secrets) ---
+.aws/
+*.pem
+*.key
+
+# --- PEP 582 ---
+__pypackages__/
+
+# --- Project-specific helpers ---
+# If you ever generate temporary examples or scripts, keep their caches out:
+examples/**/__pycache__/
+scripts/**/__pycache__/
+
+# --- Pipenv note ---
+# Keep Pipfile and Pipfile.lock under version control (do not ignore).
