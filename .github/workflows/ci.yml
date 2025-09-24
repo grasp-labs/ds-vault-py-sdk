@@ -51,4 +51,4 @@ jobs:
           pipenv run coverage report -m --omit="*/tests/*"
 
       - name: Build
-        run: python -m build
+        run: pipenv run python -m build
