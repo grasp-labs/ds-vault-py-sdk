@@ -20,12 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: shared actions
-        uses: ./.github/actions/shared-python
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          python-version: "3.12"
 
       - name: Install Pipenv
         run: |
