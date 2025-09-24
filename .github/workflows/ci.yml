@@ -31,11 +31,8 @@ jobs:
           python -m pip install pipenv
 
       - name: Install dependencies
-        env:
-          PIPENV_VENV_IN_PROJECT: "1"
-          PIPENV_IGNORE_VIRTUALENVS: "1"
         run: |
-          pipenv sync --dev --deploy
+          pipenv sync --dev
 
       - name: Test
         env:
