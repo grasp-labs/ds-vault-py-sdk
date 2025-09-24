@@ -13,7 +13,7 @@ jobs:
       AWS_REGION: eu-north-1
       DOMAIN: ds
       SERVICE_GROUP: packages
-      SERVICE_NAME: vault-sdk
+      SERVICE_NAME: vault-py-sdk
       ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
     steps:
