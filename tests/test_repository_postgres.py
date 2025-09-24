@@ -53,7 +53,7 @@ def test_postgres_repo_sqlite_mock_e2e_unwrap_and_decrypt(
             INSERT INTO {table} (
               id, tenant_id, owner_id, issuer, name, version, description, status,
               metadata, tags, created_at, created_by, modified_at, modified_by,
-              key, store, value, acl, iv, tag, wrapped_dek, kek_key_id, dek_alg, kek_alg
+              key, store, value, acl, iv, tag, wrapped_dek, kek_key_id, dek_alg, wrap_alg
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,  # noqa
             (

@@ -48,7 +48,7 @@ def test_unwrap_and_decrypt_round_trip_compatible():
         wrapped_dek=b64e(b"WRAPPED:" + dek),
         kek_key_id="arn:aws:kms:eu-north-1:123456789012:key/abcd-ef",
         dek_alg="AES256-GCM",
-        kek_alg="AWS-KMS",
+        wrap_alg="AWS-KMS",
         description="postgres password",
         metadata={"env": "prod"},
         tags={"team": "platform"},

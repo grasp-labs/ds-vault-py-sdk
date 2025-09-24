@@ -135,7 +135,7 @@ def create_sqlite_table(conn: sqlite3.Connection, table: str):
             wrapped_dek TEXT NOT NULL,
             kek_key_id TEXT NOT NULL,
             dek_alg TEXT NOT NULL,
-            kek_alg TEXT NOT NULL
+            wrap_alg TEXT NOT NULL
         )
         """  # noqa
     )
