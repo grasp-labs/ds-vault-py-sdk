@@ -12,6 +12,7 @@ class SecretRepository(ABC):
         raise NotImplementedError
 
     @staticmethod
-    def generate_key(id: UUID, tenant_id: UUID, store: Store, environment: Environment) -> str:
+    def generate_key(
+        id: UUID, tenant_id: UUID, store: Store, environment: Environment
+    ) -> str:
         return f"/ds_vault/{store}/{tenant_id}/{id}/{environment}"
-    

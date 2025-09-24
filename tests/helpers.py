@@ -1,15 +1,17 @@
 import base64
 import datetime as dt
+import json
 import uuid
 
 import sqlite3
 
 
 # -------- Utils -------- #
-def b64e(b: bytes) -> str: return base64.b64encode(b).decode()
+def b64e(b: bytes) -> str:
+    return base64.b64encode(b).decode()
+
 
 # -------- SQLITE -------- #
-
 def sqlite_psycopg_connect(dsn: str, autocommit: bool = False, row_factory=None):
     """
     Drop-in replacement for psycopg.connect used by the repository.
@@ -36,18 +38,20 @@ class _SqliteCursorWrapper:
         q, i = [], 0
         while i < len(sql):
             if sql[i] == "%" and i + 1 < len(sql) and sql[i + 1] == "s":
-                q.append("?"); i += 2
+                q.append("?")
+                i += 2
             else:
-                q.append(sql[i]); i += 1
+                q.append(sql[i])
+                i += 1
         sql3 = "".join(q)
 
         # 🔧 ADAPT PARAM TYPES FOR SQLITE
         def _adapt(p):
-            if isinstance(p, uuid.UUID):                     # UUID -> str
+            if isinstance(p, uuid.UUID):  # UUID -> str
                 return str(p)
             if isinstance(p, (dt.datetime, dt.date, dt.time)):  # dt -> ISO
                 return p.isoformat()
-            if isinstance(p, (dict, list)):             # JSON-like -> text
+            if isinstance(p, (dict, list)):  # JSON-like -> text
                 return json.dumps(p)
             return p
 
@@ -74,19 +78,29 @@ class _SqliteConnWrapper:
 
 # -------- KMS -------- #
 
+
 class FakeKMS:
     """Minimal test double for KMS that validates enc ctx & key id."""
-    def __init__(self, dek: bytes, expect_ctx: dict[str, str], expect_key_id: str | None):
+
+    def __init__(
+        self, dek: bytes, expect_ctx: dict[str, str], expect_key_id: str | None
+    ):
         self._dek = dek
         self._expect_ctx = expect_ctx
         self._expect_key_id = expect_key_id
         self.calls = 0
 
-    def decrypt_dek(self, *, wrapped_dek_b64: str, encryption_context=None, key_id=None) -> bytes:
+    def decrypt_dek(
+        self, *, wrapped_dek_b64: str, encryption_context=None, key_id=None
+    ) -> bytes:
         self.calls += 1
-        assert encryption_context == self._expect_ctx, f"enc ctx mismatch: {encryption_context} != {self._expect_ctx}"
+        assert (
+            encryption_context == self._expect_ctx
+        ), f"enc ctx mismatch: {encryption_context} != {self._expect_ctx}"
         if self._expect_key_id:
-            assert key_id == self._expect_key_id, f"key id mismatch: {key_id} != {self._expect_key_id}"
+            assert (
+                key_id == self._expect_key_id
+            ), f"key id mismatch: {key_id} != {self._expect_key_id}"
         base64.b64decode(wrapped_dek_b64)  # sanity check base64
         return self._dek
 
@@ -123,7 +137,7 @@ def create_sqlite_table(conn: sqlite3.Connection, table: str):
             dek_alg TEXT NOT NULL,
             kek_alg TEXT NOT NULL
         )
-        """
+        """  # noqa
     )
     conn.commit()
 
@@ -131,13 +145,11 @@ def create_sqlite_table(conn: sqlite3.Connection, table: str):
 # -------- SSM -------- #
 class FakeSSM:
     """Returns the ciphertext (base64) stored in SSM under Name=key."""
+
     def __init__(self, value_b64: str):
         self.value_b64 = value_b64
         self.calls = []
+
     def get_parameter(self, **kwargs):
         self.calls.append(kwargs)
         return {"Parameter": {"Value": self.value_b64}}
-
-
-def b64e(b: bytes) -> str:
-    return base64.b64encode(b).decode()

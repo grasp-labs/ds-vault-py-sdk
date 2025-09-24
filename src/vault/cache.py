@@ -6,10 +6,13 @@ import typing
 
 class TTLCache:
     """Tiny in-process TTL+LRU cache."""
+
     def __init__(self, maxsize: int = 1024, ttl_seconds: int = 300) -> None:
         self.maxsize = maxsize
         self.ttl = ttl_seconds
-        self._store: collections.OrderedDict[typing.Hashable, typing.Tuple[float, typing.Any]] = collections.OrderedDict()
+        self._store: collections.OrderedDict[
+            typing.Hashable, typing.Tuple[float, typing.Any]
+        ] = collections.OrderedDict()
 
     def _purge_expired(self) -> None:
         now = time.time()

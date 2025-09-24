@@ -1,16 +1,14 @@
-# src/dsvault/repositories/memory.py
 from __future__ import annotations
-from typing import Dict, Tuple, Optional
-from uuid import UUID
+import typing
 from .base import SecretRepository
-from ..models import Environment, SecretRecord, Store
+from ..models import SecretRecord
 
 
 class InMemorySecretRepository(SecretRepository):
-    def __init__(self, data: Dict[str, SecretRecord] | None = None):
+    def __init__(self, data: typing.Dict[str, SecretRecord] | None = None):
         self._data = data or {}
 
-    def get_secret_record(self, *, key: str) -> Optional[SecretRecord]:
+    def get_secret_record(self, *, key: str) -> typing.Optional[SecretRecord]:
         """Fetch a SecretRecord from the datastore by id + tenant + store + environment."""
         return self._data.get(key)
 

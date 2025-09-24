@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 coverage = "*"
 pytest = "*"
+build = "*"
+twine = "*"
 
 [packages]
 boto3 = "*"

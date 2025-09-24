@@ -1,6 +1,4 @@
-# src/vault/providers/ssm.py
 from __future__ import annotations
-from typing import Optional
 import boto3
 from ..cache import TTLCache
 
@@ -10,6 +8,7 @@ class SSMProvider:
     Thin wrapper around AWS SSM Parameter Store with a small TTL cache.
     If parameter_prefix is set, it is prepended to names (e.g., "/prod/app").
     """
+
     def __init__(
         self,
         *,

@@ -1,7 +1,9 @@
 # tests/test_get_secret_with_aad.py
-import os, base64, datetime as dt
-import uuid
+import datetime as dt
+import os
 import pytest
+import uuid
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from vault import DSVaultClient, SecretRecord, SecretNotFound
@@ -11,6 +13,7 @@ from vault.models import Status
 from vault.repositories.memory import InMemorySecretRepository
 
 from .helpers import b64e, FakeKMS
+
 
 def test_unwrap_and_decrypt_round_trip_compatible():
     tenant_id = uuid.uuid4()
@@ -64,6 +67,7 @@ def test_unwrap_and_decrypt_round_trip_compatible():
 
     out = client.get_secret(key=key)
     assert out == b"p@ssw0rd"
+
 
 def test_get_secret_not_found():
     repo = InMemorySecretRepository()

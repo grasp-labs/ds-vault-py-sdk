@@ -20,7 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Your shared composite action (sets up Python 3.12 + AWS creds)
       - name: shared actions
         uses: ./.github/actions/shared-python
         with:
@@ -28,7 +27,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # Ensure pipenv is installed in the runner
       - name: Install Pipenv
         run: |
           python -m pip install --upgrade pip
@@ -36,7 +34,7 @@ jobs:
 
       - name: Install dependencies
         env:
-          PIPENV_VENV_IN_PROJECT: "1"   # create .venv/ in repo
+          PIPENV_VENV_IN_PROJECT: "1"
           PIPENV_IGNORE_VIRTUALENVS: "1"
         run: |
           pipenv sync --dev --deploy
@@ -48,3 +46,6 @@ jobs:
         run: |
           pipenv run coverage run --source=src -m pytest -q
           pipenv run coverage report -m --omit="*/tests/*"
+
+      - name: Build
+        run: python -m build

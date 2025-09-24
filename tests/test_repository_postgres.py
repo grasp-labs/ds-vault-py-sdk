@@ -1,4 +1,3 @@
-import base64
 import datetime as dt
 import os
 import sqlite3
@@ -15,7 +14,10 @@ from vault.models import Status
 
 from .helpers import b64e, create_sqlite_table, FakeKMS
 
-def test_postgres_repo_sqlite_mock_e2e_unwrap_and_decrypt(sqlite_mem_dsn, keepalive_conn):
+
+def test_postgres_repo_sqlite_mock_e2e_unwrap_and_decrypt(
+    sqlite_mem_dsn, keepalive_conn
+):
     # table name has hex ending to avoid collisions
     table = f"secrets_{uuid.uuid4().hex[:8]}"
     # keep connection alive
@@ -53,7 +55,7 @@ def test_postgres_repo_sqlite_mock_e2e_unwrap_and_decrypt(sqlite_mem_dsn, keepal
               metadata, tags, created_at, created_by, modified_at, modified_by,
               key, store, value, acl, iv, tag, wrapped_dek, kek_key_id, dek_alg, kek_alg
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            """,  # noqa
             (
                 str(secret_id),
                 str(tenant_id),
@@ -72,7 +74,7 @@ def test_postgres_repo_sqlite_mock_e2e_unwrap_and_decrypt(sqlite_mem_dsn, keepal
                 key,
                 "ds_vault",
                 value_b64,
-                None,          # acl
+                None,  # acl
                 iv_b64,
                 tag_b64,
                 wrapped_dek_b64,

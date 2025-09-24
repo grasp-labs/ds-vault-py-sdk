@@ -1,15 +1,14 @@
 from __future__ import annotations
-from uuid import UUID
 from typing import Optional, Mapping
 
 from .aad import aad_and_enc_ctx_from_record, AADEncCtxBuilder
 from .cache import TTLCache
 from .crypto import decrypt_aes_gcm_bytes
 from .exceptions import SecretNotFound, DecryptionFailed
-from .models import Environment, Store
 from .providers.kms import KMSProvider
 from .providers.ssm import SSMProvider
 from .repositories.base import SecretRepository
+
 
 class DSVaultClient:
     def __init__(
@@ -35,7 +34,7 @@ class DSVaultClient:
             cached = self._pt_cache.get(key)
             if cached is not None:
                 return cached
-        
+
         rec = self._repo.get_secret_record(key=key)
         if rec is None:
             raise SecretNotFound(f"Secret {key} not found")
@@ -58,7 +57,9 @@ class DSVaultClient:
         # - DS Vault: ciphertext stored in DB (rec.value)
         # - AWS SSM: ciphertext stored in Parameter Store under rec.key
         if (rec.store or "").lower() == "aws_ssm":
-            value_b64 = self._ssm.get_parameter_value(rec.key, bypass_cache=bypass_cache)
+            value_b64 = self._ssm.get_parameter_value(
+                rec.key, bypass_cache=bypass_cache
+            )
         else:
             value_b64 = rec.value
 
@@ -72,6 +73,6 @@ class DSVaultClient:
             )
         except Exception as e:
             raise DecryptionFailed(f"AES-GCM decrypt failed: {e}") from e
-        
+
         self._pt_cache.set(key, pt)
         return pt

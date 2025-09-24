@@ -11,6 +11,7 @@ def b64e(b: bytes) -> str:
 
 class FakeBoto3KMS:
     """Minimal fake KMS client that records decrypt calls and returns a fixed plaintext."""
+
     def __init__(self, plaintext: bytes = b"PLAINTEXT-DEK"):
         self.plaintext = plaintext
         self.calls = []

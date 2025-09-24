@@ -45,12 +45,12 @@ class SecretRecord:
     store: str  # keep as str to match DB, values like Store.DS_VAULT.value
     value: str  # base64 ciphertext (no tag)
     acl: Dict
-    iv: str     # base64 12-byte nonce
-    tag: str    # base64 16-byte GCM tag
+    iv: str  # base64 12-byte nonce
+    tag: str  # base64 16-byte GCM tag
     wrapped_dek: str  # base64 KMS-wrapped DEK (CiphertextBlob)
-    kek_key_id: str   # KMS key id or alias (informational)
-    dek_alg: str      # e.g., "AES-256-GCM"
-    kek_alg: str      # e.g., "aws-kms"
+    kek_key_id: str  # KMS key id or alias (informational)
+    dek_alg: str  # e.g., "AES-256-GCM"
+    wrap_alg: str  # e.g., "aws-kms"
 
     # Optionals (with defaults after required)
     owner_id: Optional[str] = None

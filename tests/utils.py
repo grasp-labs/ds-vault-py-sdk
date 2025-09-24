@@ -8,5 +8,3 @@ class FakeKMSProvider:
 
     def __init__(self, dek: bytes):
         self._dek = dek
-
-    

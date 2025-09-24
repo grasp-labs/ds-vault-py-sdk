@@ -1,7 +1,6 @@
 from __future__ import annotations
 import typing
 import re
-import uuid
 
 import psycopg
 from psycopg.rows import tuple_row
@@ -26,9 +25,9 @@ class PostgresSecretRepository(SecretRepository):
     """
 
     def __init__(
-        self, 
-        dsn: str, 
-        *, 
+        self,
+        dsn: str,
+        *,
         table: str = "secrets",
         cache_ttl_seconds: int = 60,
         cache_maxsize: int = 4096,
@@ -62,7 +61,7 @@ class PostgresSecretRepository(SecretRepository):
             wrapped_dek,
             kek_key_id,
             dek_alg,
-            kek_alg,
+            wrap_alg,
         ) = row
 
         return SecretRecord(
@@ -89,10 +88,10 @@ class PostgresSecretRepository(SecretRepository):
             wrapped_dek=wrapped_dek,
             kek_key_id=kek_key_id,
             dek_alg=dek_alg,
-            kek_alg=kek_alg,
+            wrap_alg=wrap_alg,
         )
 
-    def get_secret_record(self, *, key: str) -> Optional[SecretRecord]:
+    def get_secret_record(self, *, key: str) -> typing.Optional[SecretRecord]:
         # Cache by the exact lookup key string
         cached = self._cache.get(key)
         if cached is not None:
@@ -101,17 +100,17 @@ class PostgresSecretRepository(SecretRepository):
         sql = (
             f"SELECT id, tenant_id, owner_id, issuer, name, version, description, status, "
             f"metadata, tags, created_at, created_by, modified_at, modified_by, "
-            f"key, store, value, acl, iv, tag, wrapped_dek, kek_key_id, dek_alg, kek_alg "
+            f"key, store, value, acl, iv, tag, wrapped_dek, kek_key_id, dek_alg, wrap_alg "
             f"FROM {self._table} WHERE key = %s LIMIT 1"
         )
-        params = tuple(key)
+
         with psycopg.connect(self._dsn, autocommit=True, row_factory=tuple_row) as conn:
             with conn.cursor() as cur:
                 cur.execute(sql, (key,))
                 row = cur.fetchone()
                 if not row:
                     return None
-                
+
                 rec = self._row_to_model(row)
                 self._cache.set(key, rec)
                 return rec

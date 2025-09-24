@@ -10,8 +10,8 @@ from ..cache import TTLCache
 
 class KMSProvider:
     def __init__(
-        self, 
-        *, 
+        self,
+        *,
         boto3_kms_client=None,
         cache_ttl_seconds: int = 300,
         cache_maxsize: int = 1024,
@@ -22,18 +22,20 @@ class KMSProvider:
     def _cache_key(
         self,
         wrapped_dek_b64: str,
-        encryption_context: Optional[Mapping[str, str]],
-        key_id: Optional[str],
-    ) -> Tuple[str, str, str]:
-        enc_ctx_json = json.dumps(dict(encryption_context or {}), sort_keys=True, separators=(",", ":"))
+        encryption_context: typing.Optional[typing.Mapping[str, str]],
+        key_id: typing.Optional[str],
+    ) -> typing.Tuple[str, str, str]:
+        enc_ctx_json = json.dumps(
+            dict(encryption_context or {}), sort_keys=True, separators=(",", ":")
+        )
         return (wrapped_dek_b64, enc_ctx_json, key_id or "")
 
     def decrypt_dek(
         self,
         *,
         wrapped_dek_b64: str,
-        encryption_context: Optional[Mapping[str, str]] = None,
-        key_id: Optional[str] = None,
+        encryption_context: typing.Optional[typing.Mapping[str, str]] = None,
+        key_id: typing.Optional[str] = None,
         bypass_cache: bool = False,
     ) -> bytes:
         ck = self._cache_key(wrapped_dek_b64, encryption_context, key_id)

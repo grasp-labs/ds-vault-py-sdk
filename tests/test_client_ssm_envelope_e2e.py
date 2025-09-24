@@ -1,9 +1,6 @@
-import base64
 import datetime as dt
-import sqlite3
 import uuid
 import os
-import pytest
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from vault.repositories.postgres import PostgresSecretRepository
@@ -14,6 +11,7 @@ from vault.aad import make_aad_and_enc_ctx
 from vault.providers.ssm import SSMProvider
 
 from .helpers import b64e, create_sqlite_table, FakeKMS, FakeSSM
+
 
 def test_record_in_db_cipher_in_ssm_envelope(sqlite_mem_dsn, keepalive_conn):
     table = f"secrets_{uuid.uuid4().hex[:8]}"
@@ -29,14 +27,14 @@ def test_record_in_db_cipher_in_ssm_envelope(sqlite_mem_dsn, keepalive_conn):
     lookup_key = make_key(secret_id, tenant_id, store, env)
 
     # --- Prepare envelope materials
-    dek = os.urandom(32)         # plaintext DEK
+    dek = os.urandom(32)  # plaintext DEK
     iv = os.urandom(12)
     aad, enc_ctx = make_aad_and_enc_ctx(tenant_id, lookup_key)
     aesgcm = AESGCM(dek)
     plaintext = b"p@ssw0rd"
     ct_with_tag = aesgcm.encrypt(iv, plaintext, aad)
-    value_b64 = b64e(ct_with_tag[:-16])      # ciphertext (NO tag)
-    tag_b64 = b64e(ct_with_tag[-16:])        # tag
+    value_b64 = b64e(ct_with_tag[:-16])  # ciphertext (NO tag)
+    tag_b64 = b64e(ct_with_tag[-16:])  # tag
     iv_b64 = b64e(iv)
     wrapped_dek_b64 = b64e(b"WRAPPED:" + dek)
     kek_key_id = "arn:aws:kms:eu-north-1:123456789012:key/abcd-ef"
@@ -50,12 +48,32 @@ def test_record_in_db_cipher_in_ssm_envelope(sqlite_mem_dsn, keepalive_conn):
           metadata, tags, created_at, created_by, modified_at, modified_by,
           key, store, value, acl, iv, tag, wrapped_dek, kek_key_id, dek_alg, kek_alg
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
+        """,  # noqa
         (
-            str(secret_id), str(tenant_id), None, "issuer-x", "db_password", "v3", "desc",
-            Status.ACTIVE.value, None, None, now.isoformat(), "svc", now.isoformat(), "svc",
-            lookup_key, store,
-            "", None, iv_b64, tag_b64, wrapped_dek_b64, kek_key_id, "AES256-GCM", "AWS-KMS",
+            str(secret_id),
+            str(tenant_id),
+            None,
+            "issuer-x",
+            "db_password",
+            "v3",
+            "desc",
+            Status.ACTIVE.value,
+            None,
+            None,
+            now.isoformat(),
+            "svc",
+            now.isoformat(),
+            "svc",
+            lookup_key,
+            store,
+            "",
+            None,
+            iv_b64,
+            tag_b64,
+            wrapped_dek_b64,
+            kek_key_id,
+            "AES256-GCM",
+            "AWS-KMS",
         ),
     )
     keepalive_conn.commit()
