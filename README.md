@@ -31,7 +31,7 @@ from vault import DSVaultClient
 from vault.repositories.postgres import PostgresSecretRepository
 
 repo = PostgresSecretRepository(
-    dsn="postgresql://user:pass@host:5432/db", 
+    dsn="postgresql://user:pass@host:5432/db",
     table="public.secrets",
 )
 

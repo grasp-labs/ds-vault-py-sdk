@@ -9,13 +9,14 @@ from ..models import SecretRecord, Status
 
 try:
     import psycopg  # type: ignore
+
     try:
         from psycopg.rows import tuple_row  # optional nicety
     except Exception:
         tuple_row = None  # fallback if rows module missing
     _HAS_PG = True
 except ImportError:
-    psycopg = None          # type: ignore
+    psycopg = None  # type: ignore
     tuple_row = None
     _HAS_PG = False
 
