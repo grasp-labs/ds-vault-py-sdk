@@ -8,13 +8,32 @@
 
 ## Quickstart
 
+### Install
+
+`With postgres`:
+
+```bash
+pip install "ds-vault-py-sdk[postgres]"
+```
+
+`Memory only`:
+
+```bash
+pip install ds-vault-py-sdk
+```
+
+### Usage
+
 Postgres - plain:
 
 ```python
 from vault import DSVaultClient
 from vault.repositories.postgres import PostgresSecretRepository
 
-repo = PostgresSecretRepository(dsn="postgresql://user:pass@host:5432/db", table="public.secrets")
+repo = PostgresSecretRepository(
+    dsn="postgresql://user:pass@host:5432/db",
+    table="public.secrets",
+)
 
 client = DSVaultClient(repository=repo)
 
