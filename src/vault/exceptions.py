@@ -1,4 +1,3 @@
-# src/dsvault/exceptions.py
 class SecretNotFound(Exception):
     pass
 

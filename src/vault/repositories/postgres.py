@@ -2,12 +2,22 @@ from __future__ import annotations
 import typing
 import re
 
-import psycopg
-from psycopg.rows import tuple_row
-
 from .base import SecretRepository
 from ..cache import TTLCache
 from ..models import SecretRecord, Status
+
+
+try:
+    import psycopg  # type: ignore
+    try:
+        from psycopg.rows import tuple_row  # optional nicety
+    except Exception:
+        tuple_row = None  # fallback if rows module missing
+    _HAS_PG = True
+except ImportError:
+    psycopg = None          # type: ignore
+    tuple_row = None
+    _HAS_PG = False
 
 
 _VALID_TABLE = re.compile(r"^[A-Za-z0-9_\.]+$")
@@ -92,6 +102,11 @@ class PostgresSecretRepository(SecretRepository):
         )
 
     def get_secret_record(self, *, key: str) -> typing.Optional[SecretRecord]:
+        if not _HAS_PG:
+            raise ImportError(
+                "psycopg3 is not installed. Install the Postgres extra:\n"
+                "  pip install 'ds-vault-py-sdk[postgres]'"
+            )
         # Cache by the exact lookup key string
         cached = self._cache.get(key)
         if cached is not None:

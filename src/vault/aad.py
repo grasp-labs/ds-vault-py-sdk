@@ -1,4 +1,3 @@
-# src/dsvault/aad.py
 from __future__ import annotations
 import typing
 import uuid
